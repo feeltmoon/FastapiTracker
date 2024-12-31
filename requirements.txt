@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+sqlalchemy
+sqlite3  # (This is built into Python, so not necessary, but included for clarity)
+streamlit
+requests

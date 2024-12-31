@@ -1,20 +1,20 @@
 # frontend/streamlit_app.py
 
 import streamlit as st
+import pandas as pd
 import requests
 
 def main():
     st.title("Data Entry App")
 
-    # Collect user inputs
+    st.header("Enter Information")
     lead_dbp = st.text_input("Lead DBP:")
     study = st.text_input("Study:")
     email = st.text_input("Email:")
     study_status = st.text_input("Study Status:")
 
-    # When user clicks 'Submit', send data to FastAPI
     if st.button("Submit"):
-        # Adjust your backend URL/port as needed
+        # FastAPI endpoint
         backend_url = "http://localhost:8000/submit_info"
         
         payload = {
@@ -29,6 +29,24 @@ def main():
             if response.status_code == 200:
                 data = response.json()
                 st.success(data.get("message", "Information saved!"))
+            else:
+                st.error(f"Error: {response.status_code} - {response.text}")
+        except Exception as e:
+            st.error(f"Failed to connect to the backend: {e}")
+    
+    st.header("View Saved Data")
+    if st.button("Load Data"):
+        # Endpoint to get all records
+        get_info_url = "http://localhost:8000/get_info"
+        try:
+            response = requests.get(get_info_url)
+            if response.status_code == 200:
+                data = response.json()  # This is a list of dicts
+                if data:
+                    df = pd.DataFrame(data)
+                    st.dataframe(df)
+                else:
+                    st.warning("No records found.")
             else:
                 st.error(f"Error: {response.status_code} - {response.text}")
         except Exception as e:
